@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BunX-Tech | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bun-pink: #ff43ad;
+            --bun-purple: #8b5cf6;
+        }
+        body { 
+            background-color: #000; 
+            font-family: 'Inter', sans-serif;
+            /* Fundo sombreado com gradiente radial */
+            background: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
+            min-height: 100-vh;
+            color: #fff;
+        }
+        .font-bun { 
+            font-family: 'Space Grotesk', sans-serif; 
+            font-style: italic;
+            text-transform: lowercase;
+        }
+        /* Efeito de brilho igual à imagem 'fast' */
+        .neon-glow {
+            text-shadow: 0 0 20px rgba(255, 67, 173, 0.5);
+            color: #fff;
+        }
+        .bun-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .bun-input:focus {
+            border-color: var(--bun-pink);
+            background: rgba(255, 67, 173, 0.05);
+            box-shadow: 0 0 15px rgba(255, 67, 173, 0.2);
+        }
+
+        #status-terminal {
+        font-family: 'Courier New', monospace; /* Fonte de largura fixa evita tremedeira */
+        min-height: 1.5rem;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md p-8 relative">
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-pink-600 rounded-full blur-[100px] opacity-20"></div>
+
+        <div id="status-terminal" class="h-6 text-[10px] font-tech text-pink-500 uppercase tracking-[0.3em] mb-2 min-h-[1.5rem]"></div>
+
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-bun font-bold italic tracking-tighter neon-glow">
+                bun<span class="text-pink-500">x</span>-tech
+            </h1>
+            
+        </div>
+
+        <form id="loginForm" class="space-y-4">
+            <div class="space-y-2">
+                <input type="email" id="email" required 
+                    class="w-full p-4 rounded-lg bun-input outline-none text-sm"
+                    placeholder="IDENTIFICAÇÃO (EMAIL)">
+            </div>
+
+            <div class="space-y-2">
+                <input type="password" id="senha" required 
+                    class="w-full p-4 rounded-lg bun-input outline-none text-sm"
+                    placeholder="CÓDIGO DE ACESSO">
+            </div>
+
+            <button type="submit" 
+                class="w-full p-4 mt-4 rounded-lg bg-white text-black font-bold uppercase tracking-widest hover:bg-pink-500 hover:text-white transition-all duration-300 transform active:scale-95">
+                Entrar no Sistema
+            </button>
+        </form>
+
+        <div class="mt-10 flex justify-between items-center text-[10px] text-gray-600 uppercase tracking-widest border-t border-white/5 pt-6">
+            <span>v0.0.1-bunX</span>
+            <a href="/cadastro-page" class="hover:text-pink-500 transition-colors">Criar Novo Perfil</a>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const terminal = document.getElementById('status-terminal');
+
+        // Esta função resolve o problema do texto "estranho" misturado
+        function executarAnimacaoTerminal(textoFinal) {
+            const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+            let iteracao = 0;
+            
+            // Limpa qualquer animação anterior que possa estar rodando
+            if (window.terminalInterval) clearInterval(window.terminalInterval);
+
+            window.terminalInterval = setInterval(() => {
+                terminal.innerText = textoFinal.split("")
+                    .map((letra, indice) => {
+                        if(indice < iteracao) {
+                            return textoFinal[indice]; // Fixa a letra correta
+                        }
+                        // Gera um caractere aleatório enquanto não chega na vez da letra
+                        return caracteres[Math.floor(Math.random() * caracteres.length)];
+                    })
+                    .join("");
+                
+                if(iteracao >= textoFinal.length) clearInterval(window.terminalInterval);
+                
+                iteracao += 1 / 3; // Ajuste aqui para velocidade (maior = mais rápido)
+            }, 30);
+        }
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            // Inicia a animação de processamento
+            executarAnimacaoTerminal("> VALIDANDO IDENTIDADE NEURAL...");
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+                    
+                    // Animação final de sucesso
+                    executarAnimacaoTerminal(`> BEM-VINDO, ${data.usuario.username.toUpperCase()}!`);
+                    
+                    // Redireciona após a animação terminar de "decifrar"
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+
+                } else {
+                    executarAnimacaoTerminal("> ERRO: ACESSO NEGADO. DADOS INVÁLIDOS.");
+                }
+            } catch (error) {
+                executarAnimacaoTerminal("> ERRO: SERVIDOR OFFLINE. UNIDADE NÃO RESPONDE.");
+            }
+        });
+    </script>
+</body>
+</html>

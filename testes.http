@@ -1,0 +1,131 @@
+### Variáveis para facilitar
+@url = http://localhost:3000
+
+### 1. Testar conexão (Boas-vindas)
+GET {{url}}/
+
+###
+
+### 2. Criar um novo Post (Tweet Tech)
+POST {{url}}/postar
+Content-Type: application/json
+
+{
+    "usuario": "@fantasma",
+    "conteudo": "Qua dia cocô"
+}
+
+###
+
+### 3. Ver o Feed atualizado
+### 4. Ver o Feed SEM filtro (Todos os posts)
+### 7. Ver o Feed para pegar um ID
+GET {{url}}/feed
+
+###
+
+### 5. Ver o Feed filtrado por um usuário existente
+# (Substitua pelo usuário que você criou no teste anterior)
+GET {{url}}/feed?usuario=@dev_aprendiz
+
+###
+
+### 6. Ver o Feed de um usuário que não existe
+GET {{url}}/feed?usuario=@carlinhos
+
+###
+
+### 8. Deletar um post (Substitua o '1' pelo ID real que você viu no feed)
+DELETE {{url}}/postar/2
+
+###
+
+### 9. Tentar deletar um post que não existe
+DELETE {{url}}/postar/9999
+
+### 10. Testar post VAZIO (Deve falhar)
+POST {{url}}/postar
+Content-Type: application/json
+
+{
+    "usuario": "@dev",
+    "conteudo": ""
+}
+
+###
+
+### 11. Testar post MUITO LONGO (Deve falhar)
+POST {{url}}/postar
+Content-Type: application/json
+
+{
+    "usuario": "@dev",
+    "conteudo": "Este é um post propositalmente longo para testar se o nosso contador de caracteres no Bun.js está funcionando corretamente. No X original, tínhamos 140 caracteres, depois mudou para 280. Se eu continuar escrevendo aqui, eventualmente passarei desse limite e o servidor Elysia deve me enviar um erro 400 Bad Request indicando que eu falei demais hoje!"
+}
+
+### 12. Cadastro de novo usuário
+POST {{url}}/registro
+Content-Type: application/json
+
+{
+    "username": "jose_tech",
+    "email": "jose@email.com",
+    "senha": "senha123456"
+}
+
+###
+
+### 13. Teste de E-mail Inválido (Deve dar erro 400)
+POST {{url}}/registro
+Content-Type: application/json
+
+{
+    "username": "curioso",
+    "email": "email-errado-sem-arroba",
+    "senha": "123"
+}
+
+###
+
+### 14. Login Sucesso
+POST {{url}}/login
+Content-Type: application/json
+
+{
+    "email": "jose@email.com",
+    "senha": "senha123456"
+}
+
+### Testes atualizados
+
+### A. Criar o Usuário
+POST {{url}}/registro
+Content-Type: application/json
+
+{
+    "username": "coder_zero",
+    "email": "zero@test.com",
+    "senha": "senha_segura"
+}
+
+### B. Fazer Login (Para descobrir seu ID)
+POST {{url}}/login
+Content-Type: application/json
+
+{
+    "email": "zero@test.com",
+    "senha": "senha_segura"
+}
+
+### C. Postar usando o ID que você recebeu no Login
+# (Supondo que seu ID seja 1)
+POST {{url}}/postar
+Content-Type: application/json
+
+{
+    "usuario_id": 1,
+    "conteudo": "Meu primeiro post conectado ao meu perfil real no Bun! 🚀"
+}
+
+### D. Ver o Feed
+GET {{url}}/feed
