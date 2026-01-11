@@ -1,4 +1,4 @@
-# 🦊 bunx<span style="color: #ff43ad">x</span>-tech
+# 🦊 bun<span style="color: #ff43ad">x</span>-tech
 
 > Uma rede social descentralizada de próxima geração. Conecte-se. Transmita. Sincronize.
 
@@ -16,6 +16,8 @@
 ## 🔮 Sobre o Projeto
 
 **bunx-tech** é uma plataforma de rede social futurista construída com [Bun](https://bun.com), combinando tecnologia de ponta com design cyberpunk. Um sistema de posts em tempo real com autenticação segura, gerenciamento de usuários e interface neon-noir.
+
+> **ℹ️ Informação Importante:** Este projeto é um **site em desenvolvimento** e **não está disponível para download**. Atualmente é destinado apenas a **testes pessoais**. A plataforma não está pronta para uso público.
 
 ```
 > SINCRONIZAÇÃO ATIVA...
@@ -65,7 +67,7 @@ bun install
 
 ### 2. **Executar o Servidor**
 ```bash
-bun run index.ts
+bun --watch index.ts
 ```
 
 ### 3. **Acessar a Plataforma**
@@ -214,7 +216,7 @@ Este projeto é open source. Sinta-se livre para usar, modificar e compartilhar!
 
 ## 👨‍💻 Desenvolvedor
 
-Criado com ❤️ e muita cafeína ☕
+Criado com ❤️ e muita cafeína ☕ por **HTorike**
 
 ```
 > UNIDADE OPERACIONAL: BUNX-TECH
@@ -228,6 +230,6 @@ Criado com ❤️ e muita cafeína ☕
 
 **v0.0.1** — *A rede do futuro está aqui*
 
-[🌐 Visite](#) • [📧 Contato](#) • [🐛 Reportar Bug](#)
+[🌐 Visite](#) • [📧 Contato](mailto:hacchimantorike@gmail.com) • [🐛 Reportar Bug](mailto:hacchimantorike@gmail.com)
 
 </div>
