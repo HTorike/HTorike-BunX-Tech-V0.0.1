@@ -99,24 +99,31 @@ const app = new Elysia()
     
 // Rotas de posts
 
-    .get('/feed', ({ query }) => {
-        const posts = db.query(`
-            SELECT 
-            posts.id, 
-            posts.conteudo, 
-            posts.data_postagem, 
-            posts.usuario_id,
-            usuarios.username 
-            FROM posts 
-            JOIN usuarios ON posts.usuario_id = usuarios.id 
-            ORDER BY posts.data_postagem DESC
-            `).all() as any[];
-
-        return (posts.map(post => ({
-            ...post,
-            tempo_relativo: calcularTempoRelativo(post.data_postagem)
-        })));
-    })
+    app.guard({
+        beforeHandle({set, headers}) {
+            if (!headers['authorization'] && !headers['user-id']) {
+                set.status = 401;
+                return {
+                    status: "Erro",
+                    mensagem: "Acesso não autorizado. Protocolo de segurança ativo. (＃＞＜)"
+                };
+            }
+        }
+    }, (protectedApp) =>
+        protectedApp
+    
+            .get('/feed', () => {
+                const posts = db.query(`
+                    SELECT posts.id, posts.conteudo, posts.data_postagem, posts.usuario_id, usuarios.username
+                    FROM posts
+                    JOIN usuarios ON posts.usuario_id = usuarios.id
+                    ORDER BY posts.data_postagem DESC
+                    `).all() as any[];
+                    return posts.map(post => ({
+                        ...post,
+                        tempo_relativo: calcularTempoRelativo(post.data_postagem)
+                    }));
+            })
 
     .post('/postar', ({body, set}) => {
         const {usuario_id, conteudo} = body;
@@ -158,6 +165,7 @@ const app = new Elysia()
             mensagem: `O post #${id} foi removido com sucesso.👍`
         };
     })
+    )
 
     .listen(3000, () => console.log('🦊 Servidor rodando em http://localhost:3000'));
     

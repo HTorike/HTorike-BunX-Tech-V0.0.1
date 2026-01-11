@@ -13,29 +13,31 @@
         body { 
             background-color: #000; 
             font-family: 'Inter', sans-serif;
-            /* Fundo radial sutil para profundidade */
             background: radial-gradient(circle at top center, #111 0%, #000 80%);
             color: #fff;
             min-height: 100vh;
         }
-        /* ESTILO DO CARD CYBORG */
         .bun-card {
-            /* Vidro escuro */
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px); /* Efeito de desfoque atrás do card */
+            backdrop-filter: blur(5px); 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Efeito ao passar o mouse */
         .bun-card:hover {
-            border-color: rgba(255, 67, 173, 0.4); /* Borda rosa neon */
-            box-shadow: 0 0 25px rgba(255, 67, 173, 0.1); /* Brilho sutil */
-            transform: translateY(-2px); /* Leve levitação */
+            border-color: rgba(255, 67, 173, 0.4); 
+            box-shadow: 0 0 25px rgba(255, 67, 173, 0.1); 
+            transform: translateY(-2px); 
         }
         .font-tech { font-family: 'Space Grotesk', sans-serif; }
     </style>
 </head>
 <body class="p-4 md:p-10 flex justify-center">
+
+    <script>
+        if (!localStorage.getItem('usuario')) {
+            window.location.href = '/login-page';
+        }
+    </script>
 
     <div class="w-full max-w-6xl flex flex-col md:flex-row gap-10">
         
@@ -58,29 +60,6 @@
                     </button>
                 </div>
             </section>
-
-            <script>
-                async function enviarPost() {
-                    const conteudo = document.getElementById('post-conteudo').value;
-                    const user = JSON.parse(localStorage.getItem('usuario'));
-
-                    if (!user) return alert("Erro: Conexão perdida. Faça login novamente.");
-
-                    const response = await fetch('/postar', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            usuario_id: user.id, // Pegamos o ID real do login!
-                            conteudo: conteudo 
-                        })
-                    });
-
-                    if (response.ok) {
-                        document.getElementById('post-conteudo').value = '';
-                        carregarFeed(); // Recarrega a lista na hora
-                    }
-                }
-            </script>
             
             <div id="feed-container" class="space-y-6">
                 </div>
@@ -127,6 +106,38 @@
     </div>
 
     <script>
+        
+        (function verificarAcesso() {
+            const usuarioLogado = localStorage.getItem('usuario');
+            if (!usuarioLogado) {
+                window.location.href = '/login-page';
+            }
+        })
+
+        async function enviarPost() {
+            const conteudo = document.getElementById('post-conteudo').value;
+            const user = JSON.parse(localStorage.getItem('usuario'));
+
+            if (!user) return alert("Erro: Conexão perdida. Faça login novamente.");
+
+            const response = await fetch('/postar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'user-id': user.id
+            },
+            body: JSON.stringify({ 
+                usuario_id: user.id,
+                conteudo: conteudo 
+            })
+            });
+
+            if (response.ok) {
+            document.getElementById('post-conteudo').value = '';
+            carregarFeed();
+            }
+        }
+
         // 1. Função para criar o design do Card
         function criarCardHTML(post) {
             return `
