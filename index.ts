@@ -16,7 +16,7 @@ db.run(`
 //Tabela de posts
 db.run(`CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario_id TEXT NOT NULL,
+    usuario_id INTEGER NOT NULL,
     conteudo TEXT NOT NULL,
     data_postagem DATETIME DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
@@ -152,18 +152,24 @@ const app = new Elysia()
             })
         })
 
-    .delete('/postar/:id', ({params}) => {
-        const { id } = params;
-        const postExiste = db.query("SELECT * FROM posts WHERE id = ?").get(id);
-        if (!postExiste) {
-            return { status: "Erro", mensagem: "Post não encontrado." };
+    .delete('/postar/:id', ({params, headers, set}) => {
+        const {id} = params;
+        const userIdHeader = headers['user-id'];
+        const post = db.query("SELECT usuario_id FROM posts WHERE id = ?").get(id) as any;
+
+        if (!post) {
+            set.status = 404;
+            return {status: "Erro", mensagem: "Post não encontrado. (・・；)"};
+        }
+
+        if (post.usuario_id !== Number(userIdHeader)) {
+            set.status = 403;
+            return {status: "Erro", mensagem: "Você não tem permissão para excluir este post. (＃＞＜)"};
         }
 
         db.run("DELETE FROM posts WHERE id = ?", [id]);
-        return {
-            status: "Sucesso",
-            mensagem: `O post #${id} foi removido com sucesso.👍`
-        };
+        return {status: "Sucesso", mensagem: "Post excluído com sucesso! ＼(＾▽＾)／"};
+
     })
     )
 

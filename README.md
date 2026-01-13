@@ -29,16 +29,23 @@
 
 ## ✨ Recursos
 
-- 🔐 **Autenticação Segura** - Registro e login com hash de senha
-- 📝 **Sistema de Posts** - Crie, visualize e remova posts em tempo real
+- 🔐 **Autenticação Segura** - Registro e login com hash de senha e middleware de proteção
+- 📝 **Sistema de Posts** - Crie, visualize e remova posts em tempo real com validação
 - 👥 **Gerenciamento de Usuários** - Perfis únicos por username e email
 - ⚡ **Performance Extrema** - Rodando com Bun para velocidade máxima
-- 🎨 **UI Cyberpunk** - Interface futurista com design neon-noir
+- 🎨 **UI Cyberpunk** - Interface futurista com design neon-noir e efeitos glassmorphism
 - 📱 **Responsivo** - Funciona em desktop e dispositivos móveis
+- 🔒 **Feed Protegido** - Acesso ao feed sincronizado com autenticação por headers
 
 ---
 
-## 🛠️ Tecnologias
+## � Correções Recentes
+
+- ✅ **Feed Sincronizado** - Posts agora carregam corretamente com autenticação por header
+- ✅ **Middleware de Autenticação** - Proteção de rotas com validação de `user-id`
+- ✅ **Validação de Permissões** - Apenas proprietários podem deletar seus próprios posts
+
+---
 
 ```
 ├── Bun v1.3.5+        → Runtime JavaScript ultrarrápido
@@ -97,16 +104,16 @@ bunx-tech/
 
 ## 🔌 Endpoints da API
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `GET` | `/` | Carrega o feed principal |
-| `GET` | `/login-page` | Página de login |
-| `GET` | `/cadastro-page` | Página de registro |
-| `GET` | `/feed` | Retorna posts em JSON |
-| `POST` | `/registro` | Registra novo usuário |
-| `POST` | `/login` | Autentica usuário |
-| `POST` | `/postar` | Cria novo post |
-| `DELETE` | `/postar/:id` | Remove um post |
+| Método | Rota | Descrição | Autenticação |
+|--------|------|-----------|--------------|
+| `GET` | `/` | Carrega o feed principal | ✅ Requerida |
+| `GET` | `/login-page` | Página de login | ❌ Pública |
+| `GET` | `/cadastro-page` | Página de registro | ❌ Pública |
+| `GET` | `/feed` | Retorna posts em JSON | ✅ Requerida (header `user-id`) |
+| `POST` | `/registro` | Registra novo usuário | ❌ Pública |
+| `POST` | `/login` | Autentica usuário | ❌ Pública |
+| `POST` | `/postar` | Cria novo post | ✅ Requerida |
+| `DELETE` | `/postar/:id` | Remove um post | ✅ Requerida (proprietário) |
 
 ---
 
@@ -148,16 +155,56 @@ curl -X POST http://localhost:3000/login \
   -d '{"email":"user@example.com","senha":"senha123"}'
 ```
 
-### Criar Post
+### Criar Post (Autenticado)
 ```bash
 curl -X POST http://localhost:3000/postar \
   -H "Content-Type: application/json" \
+  -H "user-id: 1" \
   -d '{"usuario_id":1,"conteudo":"Olá, mundo! 🚀"}'
+```
+
+### Obter Feed (Autenticado)
+```bash
+curl -X GET http://localhost:3000/feed \
+  -H "user-id: 1"
+```
+
+### Deletar Post (Autenticado - Apenas Proprietário)
+```bash
+curl -X DELETE http://localhost:3000/postar/1 \
+  -H "user-id: 1"
 ```
 
 ---
 
-## 🎨 Design & Tema
+## 🔐 Autenticação
+
+### Headers Obrigatórios
+
+Rotas protegidas exigem um dos headers abaixo:
+
+```
+user-id: <número_do_usuario>
+OU
+authorization: <token>
+```
+
+**Exemplo:**
+```javascript
+fetch('/feed', {
+    headers: {
+        'user-id': 1
+    }
+})
+```
+
+### Fluxo de Autenticação
+
+1. **Registro** → Criar novo usuário
+2. **Login** → Obter ID do usuário
+3. **Usar ID** → Passar `user-id` em headers nas requisições protegidas
+
+---
 
 O projeto segue uma paleta de cores cyberpunk:
 

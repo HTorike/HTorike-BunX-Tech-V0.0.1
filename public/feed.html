@@ -140,28 +140,68 @@
 
         // 1. Função para criar o design do Card
         function criarCardHTML(post) {
-            return `
-                <article class="bun-card p-6 rounded-xl mb-4 border-l-2 border-transparent hover:border-pink-500">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-xl">🤖</div>
-                            <div>
-                                <h3 class="font-bold text-pink-500 tracking-wide">${post.username}</h3>
-                                <span class="text-[9px] text-gray-600 uppercase">BunX ID: #${post.usuario_id}</span>
-                            </div>
+        const userLogado = JSON.parse(localStorage.getItem('usuario'));
+        const botaodeletar = userLogado && post.usuario_id === userLogado.id 
+            ? `<button onclick="deletarPost(${post.id})" class="text-gray-600 hover:text-red-500 transition-colors text-xs">
+                [ APAGAR_SINAL ]
+            </button>` 
+            : '';
+
+        return `
+            <article class="bun-card p-6 rounded-xl mb-4 border-l-2 border-transparent hover:border-pink-500">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-xl">🤖</div>
+                        <div>
+                            <h3 class="font-bold text-pink-500 tracking-wide">${post.username}</h3>
+                            <span class="text-[9px] text-gray-600 uppercase">BunX ID: #${post.usuario_id}</span>
                         </div>
-                        <span class="text-[10px] text-gray-500 font-tech uppercase italic">${post.tempo_relativo}</span>
                     </div>
-                    <p class="text-gray-300 leading-relaxed pl-14">${post.conteudo}</p>
-                </article>
-            `;
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="text-[10px] text-gray-500 font-tech uppercase italic">${post.tempo_relativo}</span>
+                        ${botaodeletar}
+                    </div>
+                </div>
+                <p class="text-gray-300 leading-relaxed pl-14">${post.conteudo}</p>
+            </article>
+        `;
         }
 
-        // 2. Função para buscar dados da API e colocar na tela
+        async function deletarPost(id) {
+        if (!confirm("Confirmar exclusão permanente deste sinal?")) return;
+
+        const user = JSON.parse(localStorage.getItem('usuario'));
+
+        try {
+            const response = await fetch(`/postar/${id}`, {
+                method: 'DELETE',
+                headers: { 
+                    'user-id': user.id // Enviando para o Middleware validar
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                carregarFeed(); // Recarrega a lista
+            } else {
+                alert(data.mensagem);
+            }
+        } catch (e) {
+            alert("Erro ao tentar comunicar com o núcleo.");
+        }
+        }
+
+        // 3. Função para buscar dados da API e colocar na tela
         async function carregarFeed() {
             const container = document.getElementById('feed-container');
             try {
-                const response = await fetch('/feed');
+                const user = JSON.parse(localStorage.getItem('usuario'));
+                const response = await fetch('/feed', {
+                    headers: {
+                        'user-id': user.id
+                    }
+                });
                 const posts = await response.json();
                 
                 container.innerHTML = posts.length > 0 
@@ -172,7 +212,7 @@
             }
         }
 
-        // 3. Identificação do Usuário na Sidebar
+        // 4. Identificação do Usuário na Sidebar
         const user = JSON.parse(localStorage.getItem('usuario'));
         if(user) {
             document.getElementById('user-display').innerText = user.username;
