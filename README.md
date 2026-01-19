@@ -31,7 +31,8 @@
 
 - 🔐 **Autenticação Segura** - Registro e login com hash de senha e middleware de proteção
 - 📝 **Sistema de Posts** - Crie, visualize e remova posts em tempo real com validação
-- 👥 **Gerenciamento de Usuários** - Perfis únicos por username e email
+- �️ **Postagem de Imagens** - Compartilhe imagens diretamente nos posts com suporte a múltiplos formatos
+- �👥 **Gerenciamento de Usuários** - Perfis únicos por username e email
 - ⚡ **Performance Extrema** - Rodando com Bun para velocidade máxima
 - 🎨 **UI Cyberpunk** - Interface futurista com design neon-noir e efeitos glassmorphism
 - 📱 **Responsivo** - Funciona em desktop e dispositivos móveis
@@ -44,7 +45,7 @@
 - ✅ **Feed Sincronizado** - Posts agora carregam corretamente com autenticação por header
 - ✅ **Middleware de Autenticação** - Proteção de rotas com validação de `user-id`
 - ✅ **Validação de Permissões** - Apenas proprietários podem deletar seus próprios posts
-
+- ✅ **Suporte a Imagens em Posts** - Compartilhe imagens diretamente nos posts
 ---
 
 ```
@@ -203,6 +204,51 @@ fetch('/feed', {
 1. **Registro** → Criar novo usuário
 2. **Login** → Obter ID do usuário
 3. **Usar ID** → Passar `user-id` em headers nas requisições protegidas
+
+### Postagem com Imagem
+```javascript
+fetch('/postar', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'user-id': 1
+    },
+    body: JSON.stringify({
+        usuario_id: 1,
+        conteudo: 'Confira essa imagem! https://example.com/foto.jpg'
+    })
+})
+```
+
+---
+
+## 🖼️ Postagem de Imagens
+
+A plataforma agora suporta a postagem de imagens! Simplesmente inclua a URL da imagem no conteúdo do post.
+
+### Formatos Suportados
+- PNG (`.png`)
+- JPEG (`.jpg`, `.jpeg`)
+- GIF (`.gif`)
+- SVG (`.svg`)
+- WebP (`.webp`)
+
+### Como Usar
+
+1. **Escrever o post** com texto e URL da imagem:
+   ```
+   Olá! Confira essa imagem legal:
+   https://example.com/imagem.jpg
+   ```
+
+2. **Sistema detecta automaticamente** a URL da imagem
+3. **Imagem aparece renderizada** abaixo do texto no feed
+
+### Características Visuais
+- Imagem com bordas arredondadas e borda neon
+- Efeito de zoom ao passar o mouse
+- Tratamento automático de erros se a URL não carregar
+- Texto e imagem separados visualmente
 
 ---
 

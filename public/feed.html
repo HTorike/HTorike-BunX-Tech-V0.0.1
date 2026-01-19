@@ -138,33 +138,53 @@
             }
         }
 
+        //0.1 Função para processamento do conteúdo (ex: links)
+        function processarConteudo(texto) {
+            const regexImagem = /(https?:\/\/\S+\.(?:png|jpg|jpeg|gif|svg|webp))/i;
+            const match = texto.match(regexImagem);
+
+            if (match) {
+                const urlImagem = match [0];
+                const textoSemUrl = texto.replace(urlImagem, '').trim();
+                return `
+                <p class="text-gray-300 leading-relaxed pl-14 mb-4">${textoSemUrl}</p>
+                <div class="pl-14">
+                    <img src="${urlImagem}" class="rounded-lg border border-white/10 max-h-80 w-auto hover:scale-[1.02] transition-transform" onerror="this.style.display='none'">
+                </div>
+                `;
+            }
+
+            return `<p class="text-gray-300 leading-relaxed pl-14">${texto}</p>`;
+
+        }
+
         // 1. Função para criar o design do Card
         function criarCardHTML(post) {
-        const userLogado = JSON.parse(localStorage.getItem('usuario'));
-        const botaodeletar = userLogado && post.usuario_id === userLogado.id 
-            ? `<button onclick="deletarPost(${post.id})" class="text-gray-600 hover:text-red-500 transition-colors text-xs">
-                [ APAGAR_SINAL ]
-            </button>` 
-            : '';
+            const userLogado = JSON.parse(localStorage.getItem('usuario'));
+            const botaodeletar = userLogado && post.usuario_id === userLogado.id 
+                ? `<button onclick="deletarPost(${post.id})" class="text-gray-600 hover:text-red-500 transition-colors text-[9px] uppercase tracking-tighter">
+                    [ APAGAR_SINAL ]
+                </button>` 
+                : '';
 
-        return `
-            <article class="bun-card p-6 rounded-xl mb-4 border-l-2 border-transparent hover:border-pink-500">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-xl">🤖</div>
-                        <div>
-                            <h3 class="font-bold text-pink-500 tracking-wide">${post.username}</h3>
-                            <span class="text-[9px] text-gray-600 uppercase">BunX ID: #${post.usuario_id}</span>
+            return `
+                <article class="bun-card p-6 rounded-xl mb-4 border-l-2 border-transparent hover:border-pink-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-xl">🤖</div>
+                            <div>
+                                <h3 class="font-bold text-pink-500 tracking-wide">${post.username}</h3>
+                                <span class="text-[9px] text-gray-600 uppercase">BunX ID: #${post.usuario_id}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="text-[10px] text-gray-500 font-tech uppercase italic">${post.tempo_relativo}</span>
+                            ${botaodeletar}
                         </div>
                     </div>
-                    <div class="flex flex-col items-end gap-2">
-                        <span class="text-[10px] text-gray-500 font-tech uppercase italic">${post.tempo_relativo}</span>
-                        ${botaodeletar}
-                    </div>
-                </div>
-                <p class="text-gray-300 leading-relaxed pl-14">${post.conteudo}</p>
-            </article>
-        `;
+                    ${processarConteudo(post.conteudo)}
+                </article>
+            `;
         }
 
         async function deletarPost(id) {
