@@ -40,10 +40,11 @@
 
 ---
 
-## � Correções Recentes
+## 🔄 Correções Recentes
 
-- ✅ **Feed Sincronizado** - Posts agora carregam corretamente com autenticação por header
-- ✅ **Middleware de Autenticação** - Proteção de rotas com validação de `user-id`
+- ✅ **Autenticação JWT** - Implementação de tokens JWT com expiração de 7 dias
+- ✅ **Middleware de Proteção** - Rotas protegidas com verificação de token via `@elysiajs/jwt`
+- ✅ **Derivação de Contexto** - Acesso ao `perfil` decodificado em todas as rotas protegidas
 - ✅ **Validação de Permissões** - Apenas proprietários podem deletar seus próprios posts
 - ✅ **Suporte a Imagens em Posts** - Compartilhe imagens diretamente nos posts
 ---
@@ -107,14 +108,14 @@ bunx-tech/
 
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| `GET` | `/` | Carrega o feed principal | ✅ Requerida |
+| `GET` | `/` | Carrega o feed principal | ✅ JWT Requerido |
 | `GET` | `/login-page` | Página de login | ❌ Pública |
 | `GET` | `/cadastro-page` | Página de registro | ❌ Pública |
-| `GET` | `/feed` | Retorna posts em JSON | ✅ Requerida (header `user-id`) |
+| `GET` | `/feed` | Retorna posts em JSON | ✅ JWT Requerido |
 | `POST` | `/registro` | Registra novo usuário | ❌ Pública |
-| `POST` | `/login` | Autentica usuário | ❌ Pública |
-| `POST` | `/postar` | Cria novo post | ✅ Requerida |
-| `DELETE` | `/postar/:id` | Remove um post | ✅ Requerida (proprietário) |
+| `POST` | `/login` | Autentica e retorna JWT | ❌ Pública |
+| `POST` | `/postar` | Cria novo post | ✅ JWT Requerido |
+| `DELETE` | `/postar/:id` | Remove um post | ✅ JWT Requerido (proprietário) |
 
 ---
 
@@ -156,68 +157,115 @@ curl -X POST http://localhost:3000/login \
   -d '{"email":"user@example.com","senha":"senha123"}'
 ```
 
-### Criar Post (Autenticado)
+### Criar Post (Autenticado com JWT)
 ```bash
 curl -X POST http://localhost:3000/postar \
   -H "Content-Type: application/json" \
-  -H "user-id: 1" \
-  -d '{"usuario_id":1,"conteudo":"Olá, mundo! 🚀"}'
+  -H "Authorization: Bearer SEU_JWT_TOKEN" \
+  -d '{"conteudo":"Olá, mundo! 🚀"}'
 ```
 
-### Obter Feed (Autenticado)
+### Obter Feed (Autenticado com JWT)
 ```bash
 curl -X GET http://localhost:3000/feed \
-  -H "user-id: 1"
+  -H "Authorization: Bearer SEU_JWT_TOKEN"
 ```
 
 ### Deletar Post (Autenticado - Apenas Proprietário)
 ```bash
 curl -X DELETE http://localhost:3000/postar/1 \
-  -H "user-id: 1"
+  -H "Authorization: Bearer SEU_JWT_TOKEN"
 ```
 
 ---
 
-## 🔐 Autenticação
+## 🔐 Autenticação JWT
+
+O projeto utiliza **JWT (JSON Web Tokens)** para autenticação segura de rotas protegidas.
+
+### Configuração JWT
+
+- **Algoritmo:** HS256
+- **Expiração:** 7 dias
+- **Secret:** Configurável via variáveis de ambiente
 
 ### Headers Obrigatórios
 
-Rotas protegidas exigem um dos headers abaixo:
+Rotas protegidas exigem o header de autorização:
 
 ```
-user-id: <número_do_usuario>
-OU
-authorization: <token>
+Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Exemplo:**
+**Exemplo JavaScript:**
 ```javascript
 fetch('/feed', {
     headers: {
-        'user-id': 1
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
 })
 ```
 
 ### Fluxo de Autenticação
 
-1. **Registro** → Criar novo usuário
-2. **Login** → Obter ID do usuário
-3. **Usar ID** → Passar `user-id` em headers nas requisições protegidas
+1. **Registro** (`POST /registro`) → Criar novo usuário
+2. **Login** (`POST /login`) → Receber JWT token e dados do usuário
+3. **Armazenar** → Guardar token no localStorage (ou sessão)
+4. **Usar Token** → Passar `Authorization: Bearer <token>` em headers das rotas protegidas
+5. **Rotas Protegidas** → O servidor verifica e decodifica o token
 
-### Postagem com Imagem
+### Resposta do Login
+
+```json
+{
+  "status": "Login bem-sucedido!",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "usuario": {
+    "id": 1,
+    "username": "seu_usuario"
+  }
+}
+```
+
+### Decodificação do Token
+
+O token JWT contém as informações do usuário:
+
+```json
+{
+  "id": 1,
+  "username": "seu_usuario",
+  "iat": 1704067200,
+  "exp": 1704672000
+}
+```
+
+### Postagem com Imagem (Autenticado)
+
 ```javascript
 fetch('/postar', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
-        'user-id': 1
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
     body: JSON.stringify({
-        usuario_id: 1,
         conteudo: 'Confira essa imagem! https://example.com/foto.jpg'
     })
 })
+```
+
+### Tratamento de Erros
+
+- **401 Unauthorized** → Token inválido, expirado ou ausente
+- **403 Forbidden** → Token válido mas usuário sem permissão (ex: deletar post de outro usuário)
+
+**Exemplo de resposta de erro:**
+```json
+{
+  "status": "Erro",
+  "mensagem": "Sinal de autenticação inválido. (＃＞＜)"
+}
 ```
 
 ---

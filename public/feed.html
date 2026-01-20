@@ -116,20 +116,15 @@
 
         async function enviarPost() {
             const conteudo = document.getElementById('post-conteudo').value;
-            const user = JSON.parse(localStorage.getItem('usuario'));
-
-            if (!user) return alert("Erro: Conexão perdida. Faça login novamente.");
+            const token = localStorage.getItem('token');
 
             const response = await fetch('/postar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'user-id': user.id
-            },
-            body: JSON.stringify({ 
-                usuario_id: user.id,
-                conteudo: conteudo 
-            })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({conteudo})
             });
 
             if (response.ok) {
@@ -219,7 +214,7 @@
                 const user = JSON.parse(localStorage.getItem('usuario'));
                 const response = await fetch('/feed', {
                     headers: {
-                        'user-id': user.id
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     }
                 });
                 const posts = await response.json();
