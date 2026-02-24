@@ -37,6 +37,24 @@
         .font-tech {
             font-family: 'Space Grotesk', sans-serif;
         }
+
+        /* --- Skeleton Loading --- */
+        @keyframes shimmer {
+            0% {
+                background-position: -600px 0;
+            }
+
+            100% {
+                background-position: 600px 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.04) 75%);
+            background-size: 600px 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: 6px;
+        }
     </style>
 </head>
 
@@ -61,7 +79,12 @@
             <section class="bun-card p-6 rounded-xl mb-10 border-l-4 border-pink-500">
                 <textarea id="post-conteudo"
                     class="w-full bg-transparent outline-none text-white placeholder-gray-600 resize-none h-20"
-                    placeholder="O que está acontecendo na rede"></textarea>
+                    placeholder="O que está acontecendo na rede" oninput="atualizarContador(this.value)"
+                    maxlength="280"></textarea>
+                <div class="flex justify-end mt-1">
+                    <span id="char-counter"
+                        class="text-[10px] text-gray-600 font-tech tabular-nums transition-colors">0/280</span>
+                </div>
 
                 <!-- Campo de imagem colapsável -->
                 <div id="imagem-container" class="hidden mt-3">
@@ -139,9 +162,8 @@
                 </button>
 
                 <div class="mt-20 p-6 border-t border-white/10 text-center">
-                    <div
-                        class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-700 rounded-full mx-auto mb-4 blur-[1px] border-2 border-white/20">
-                    </div>
+                    <img id="sidebar-avatar" src="https://api.dicebear.com/9.x/bottts/svg?seed=guest"
+                        class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-pink-500/30 bg-pink-500/10" />
                     <p id="user-display" class="font-tech italic text-sm">Usuário não identificado</p>
                     <button onclick="localStorage.clear(); window.location.href='/login-page'"
                         class="text-[9px] text-red-500 mt-4 uppercase tracking-widest hover:underline">Desconectar</button>
@@ -249,7 +271,7 @@
                 <article class="bun-card p-6 rounded-xl mb-4 border-l-2 border-transparent hover:border-pink-500">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-xl">🤖</div>
+                            <img src="https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(post.username)}" alt="${post.username}" class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20" />
                             <div>
                                 <h3 class="font-bold text-pink-500 tracking-wide">${post.username}</h3>
                                 <span class="text-[9px] text-gray-600 uppercase">BunX ID: #${post.usuario_id}</span>
@@ -290,11 +312,45 @@
             }
         }
 
+        // Melhoria 2: Contador de caracteres
+        function atualizarContador(valor) {
+            const count = valor.length;
+            const counter = document.getElementById('char-counter');
+            counter.textContent = `${count}/280`;
+            if (count >= 270) {
+                counter.style.color = '#ef4444'; // vermelho
+            } else if (count >= 240) {
+                counter.style.color = '#eab308'; // amarelo
+            } else {
+                counter.style.color = '';
+            }
+        }
+
+        // Melhoria 3: Skeleton Loading
+        function mostrarSkeleton() {
+            const skeletonCard = `
+                <article class="bun-card p-6 rounded-xl mb-4 border-l-2 border-transparent">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="skeleton w-10 h-10 rounded-full flex-shrink-0"></div>
+                        <div class="flex-1 space-y-2">
+                            <div class="skeleton h-3 w-24 rounded"></div>
+                            <div class="skeleton h-2 w-16 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="pl-14 space-y-2">
+                        <div class="skeleton h-3 w-full rounded"></div>
+                        <div class="skeleton h-3 w-3/4 rounded"></div>
+                    </div>
+                </article>`;
+            document.getElementById('feed-container').innerHTML =
+                skeletonCard + skeletonCard + skeletonCard;
+        }
+
         // 3. Função para buscar dados da API e colocar na tela
         async function carregarFeed() {
             const container = document.getElementById('feed-container');
+            mostrarSkeleton();
             try {
-                const user = JSON.parse(localStorage.getItem('usuario'));
                 const response = await fetch('/feed', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -310,10 +366,12 @@
             }
         }
 
-        // 4. Identificação do Usuário na Sidebar
+        // 4. Identificação do Usuário na Sidebar (com avatar DiceBear)
         const user = JSON.parse(localStorage.getItem('usuario'));
         if (user) {
             document.getElementById('user-display').innerText = user.username;
+            document.getElementById('sidebar-avatar').src =
+                `https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(user.username)}`;
         }
 
         // Inicializa o feed ao abrir a página
