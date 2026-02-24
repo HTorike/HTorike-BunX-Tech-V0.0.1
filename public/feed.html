@@ -1,36 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BunX-Tech | Feed</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
             --bun-pink: #ff43ad;
         }
-        body { 
-            background-color: #000; 
+
+        body {
+            background-color: #000;
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at top center, #111 0%, #000 80%);
             color: #fff;
             min-height: 100vh;
         }
+
         .bun-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px); 
+            backdrop-filter: blur(5px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .bun-card:hover {
-            border-color: rgba(255, 67, 173, 0.4); 
-            box-shadow: 0 0 25px rgba(255, 67, 173, 0.1); 
-            transform: translateY(-2px); 
+            border-color: rgba(255, 67, 173, 0.4);
+            box-shadow: 0 0 25px rgba(255, 67, 173, 0.1);
+            transform: translateY(-2px);
         }
-        .font-tech { font-family: 'Space Grotesk', sans-serif; }
+
+        .font-tech {
+            font-family: 'Space Grotesk', sans-serif;
+        }
     </style>
 </head>
+
 <body class="p-4 md:p-10 flex justify-center">
 
     <script>
@@ -40,7 +49,7 @@
     </script>
 
     <div class="w-full max-w-6xl flex flex-col md:flex-row gap-10">
-        
+
         <main class="flex-1 max-w-2xl">
             <div class="mb-10 border-l-2 border-pink-500 pl-6">
                 <h1 class="text-4xl font-tech font-bold italic tracking-tighter neon-glow">
@@ -50,28 +59,59 @@
             </div>
 
             <section class="bun-card p-6 rounded-xl mb-10 border-l-4 border-pink-500">
-                <textarea id="post-conteudo" class="w-full bg-transparent outline-none text-white placeholder-gray-600 resize-none h-20"placeholder="O que está acontecendo na rede"></textarea>
-    
+                <textarea id="post-conteudo"
+                    class="w-full bg-transparent outline-none text-white placeholder-gray-600 resize-none h-20"
+                    placeholder="O que está acontecendo na rede"></textarea>
+
+                <!-- Campo de imagem colapsável -->
+                <div id="imagem-container" class="hidden mt-3">
+                    <div
+                        class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 focus-within:border-pink-500/60 transition-colors">
+                        <span class="text-gray-500 text-sm">🔗</span>
+                        <input id="post-imagem-url" type="url" placeholder="Cole a URL da imagem aqui..."
+                            class="flex-1 bg-transparent outline-none text-white text-xs placeholder-gray-600"
+                            oninput="previewImagem(this.value)" />
+                        <button onclick="limparImagem()"
+                            class="text-gray-600 hover:text-red-400 transition-colors text-xs" title="Remover imagem">
+                            ✕
+                        </button>
+                    </div>
+                    <!-- Preview em tempo real -->
+                    <div id="imagem-preview-wrapper" class="hidden mt-2 pl-1">
+                        <img id="imagem-preview" src="" alt="Preview"
+                            class="rounded-lg border border-white/10 max-h-40 w-auto object-cover opacity-70 hover:opacity-100 transition-opacity"
+                            onerror="this.parentElement.classList.add('hidden')" />
+                    </div>
+                </div>
+
                 <div class="flex justify-between items-center mt-4 border-t border-white/5 pt-4">
-                    <span class="text-[9px] text-gray-500 uppercase tracking-widest">Criptografia: Ativa</span>
-                    <button onclick="enviarPost()" 
+                    <div class="flex items-center gap-4">
+                        <span class="text-[9px] text-gray-500 uppercase tracking-widest">Criptografia: Ativa</span>
+                        <button onclick="toggleImagem()" id="btn-imagem" title="Anexar imagem"
+                            class="text-gray-500 hover:text-pink-400 transition-colors text-base leading-none">
+                            🖼️
+                        </button>
+                    </div>
+                    <button onclick="enviarPost()"
                         class="bg-white text-black px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-tighter hover:bg-pink-500 hover:text-white transition-all">
                         Transmitir
                     </button>
                 </div>
             </section>
-            
+
             <div id="feed-container" class="space-y-6">
-                </div>
+            </div>
         </main>
 
         <aside class="w-full md:w-80 space-y-4">
             <div class="sticky top-10">
-                <h2 class="text-[10px] text-gray-600 uppercase tracking-widest mb-6 font-bold border-b border-white/5 pb-2">
+                <h2
+                    class="text-[10px] text-gray-600 uppercase tracking-widest mb-6 font-bold border-b border-white/5 pb-2">
                     Módulos do Sistema
                 </h2>
 
-                <button class="w-full bun-card p-4 rounded-lg flex items-center justify-between group opacity-60 cursor-not-allowed">
+                <button
+                    class="w-full bun-card p-4 rounded-lg flex items-center justify-between group opacity-60 cursor-not-allowed">
                     <div class="flex items-center gap-3">
                         <span class="text-xl">👥</span>
                         <span class="font-tech text-xs uppercase tracking-tighter">Conexões</span>
@@ -79,15 +119,18 @@
                     <span class="text-[9px] bg-white/10 px-2 py-1 rounded text-gray-400">OFFLINE</span>
                 </button>
 
-                <button class="w-full bun-card p-4 rounded-lg flex items-center justify-between group mt-3 opacity-60 cursor-not-allowed">
+                <button
+                    class="w-full bun-card p-4 rounded-lg flex items-center justify-between group mt-3 opacity-60 cursor-not-allowed">
                     <div class="flex items-center gap-3">
                         <span class="text-xl text-purple-500">🎧</span>
                         <span class="font-tech text-xs uppercase tracking-tighter">Canais ativos</span>
                     </div>
-                    <span class="text-[9px] border border-purple-500/50 text-purple-400 px-2 py-1 rounded">ENCRIPTADO</span>
+                    <span
+                        class="text-[9px] border border-purple-500/50 text-purple-400 px-2 py-1 rounded">ENCRIPTADO</span>
                 </button>
 
-                <button class="w-full bun-card p-4 rounded-lg flex items-center justify-between group mt-3 opacity-60 cursor-not-allowed">
+                <button
+                    class="w-full bun-card p-4 rounded-lg flex items-center justify-between group mt-3 opacity-60 cursor-not-allowed">
                     <div class="flex items-center gap-3">
                         <span class="text-xl text-pink-500">💬</span>
                         <span class="font-tech text-xs uppercase tracking-tighter">Mensagens</span>
@@ -96,9 +139,12 @@
                 </button>
 
                 <div class="mt-20 p-6 border-t border-white/10 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-700 rounded-full mx-auto mb-4 blur-[1px] border-2 border-white/20"></div>
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-700 rounded-full mx-auto mb-4 blur-[1px] border-2 border-white/20">
+                    </div>
                     <p id="user-display" class="font-tech italic text-sm">Usuário não identificado</p>
-                    <button onclick="localStorage.clear(); window.location.href='/login-page'" class="text-[9px] text-red-500 mt-4 uppercase tracking-widest hover:underline">Desconectar</button>
+                    <button onclick="localStorage.clear(); window.location.href='/login-page'"
+                        class="text-[9px] text-red-500 mt-4 uppercase tracking-widest hover:underline">Desconectar</button>
                 </div>
             </div>
         </aside>
@@ -106,7 +152,7 @@
     </div>
 
     <script>
-        
+
         (function verificarAcesso() {
             const usuarioLogado = localStorage.getItem('usuario');
             if (!usuarioLogado) {
@@ -114,9 +160,42 @@
             }
         })
 
+        function toggleImagem() {
+            const container = document.getElementById('imagem-container');
+            const btn = document.getElementById('btn-imagem');
+            const isHidden = container.classList.contains('hidden');
+            container.classList.toggle('hidden', !isHidden);
+            btn.style.color = isHidden ? 'rgb(236, 72, 153)' : '';
+            if (!isHidden) limparImagem();
+        }
+
+        function previewImagem(url) {
+            const wrapper = document.getElementById('imagem-preview-wrapper');
+            const img = document.getElementById('imagem-preview');
+            const isImageUrl = /https?:\/\/\S+\.(?:png|jpg|jpeg|gif|svg|webp)/i.test(url);
+            if (isImageUrl) {
+                img.src = url;
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+            }
+        }
+
+        function limparImagem() {
+            document.getElementById('post-imagem-url').value = '';
+            document.getElementById('imagem-preview-wrapper').classList.add('hidden');
+            document.getElementById('imagem-preview').src = '';
+        }
+
         async function enviarPost() {
-            const conteudo = document.getElementById('post-conteudo').value;
+            const textoBase = document.getElementById('post-conteudo').value.trim();
+            const urlImagem = document.getElementById('post-imagem-url').value.trim();
             const token = localStorage.getItem('token');
+
+            // Concatena URL da imagem ao texto se existir
+            const conteudo = urlImagem ? `${textoBase} ${urlImagem}`.trim() : textoBase;
+
+            if (!conteudo) return;
 
             const response = await fetch('/postar', {
                 method: 'POST',
@@ -124,12 +203,16 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({conteudo})
+                body: JSON.stringify({ conteudo })
             });
 
             if (response.ok) {
-            document.getElementById('post-conteudo').value = '';
-            carregarFeed();
+                document.getElementById('post-conteudo').value = '';
+                limparImagem();
+                // Fecha o painel de imagem após transmitir
+                const container = document.getElementById('imagem-container');
+                if (!container.classList.contains('hidden')) toggleImagem();
+                carregarFeed();
             }
         }
 
@@ -139,7 +222,7 @@
             const match = texto.match(regexImagem);
 
             if (match) {
-                const urlImagem = match [0];
+                const urlImagem = match[0];
                 const textoSemUrl = texto.replace(urlImagem, '').trim();
                 return `
                 <p class="text-gray-300 leading-relaxed pl-14 mb-4">${textoSemUrl}</p>
@@ -156,10 +239,10 @@
         // 1. Função para criar o design do Card
         function criarCardHTML(post) {
             const userLogado = JSON.parse(localStorage.getItem('usuario'));
-            const botaodeletar = userLogado && post.usuario_id === userLogado.id 
+            const botaodeletar = userLogado && post.usuario_id === userLogado.id
                 ? `<button onclick="deletarPost(${post.id})" class="text-gray-600 hover:text-red-500 transition-colors text-[9px] uppercase tracking-tighter">
                     [ APAGAR_SINAL ]
-                </button>` 
+                </button>`
                 : '';
 
             return `
@@ -183,28 +266,28 @@
         }
 
         async function deletarPost(id) {
-        if (!confirm("Confirmar exclusão permanente deste sinal?")) return;
+            if (!confirm("Confirmar exclusão permanente deste sinal?")) return;
 
-        const user = JSON.parse(localStorage.getItem('usuario'));
+            const user = JSON.parse(localStorage.getItem('usuario'));
 
-        try {
-            const response = await fetch(`/postar/${id}`, {
-                method: 'DELETE',
-                headers: { 
-                    'user-id': user.id // Enviando para o Middleware validar
+            try {
+                const response = await fetch(`/postar/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'user-id': user.id // Enviando para o Middleware validar
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    carregarFeed(); // Recarrega a lista
+                } else {
+                    alert(data.mensagem);
                 }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                carregarFeed(); // Recarrega a lista
-            } else {
-                alert(data.mensagem);
+            } catch (e) {
+                alert("Erro ao tentar comunicar com o núcleo.");
             }
-        } catch (e) {
-            alert("Erro ao tentar comunicar com o núcleo.");
-        }
         }
 
         // 3. Função para buscar dados da API e colocar na tela
@@ -218,8 +301,8 @@
                     }
                 });
                 const posts = await response.json();
-                
-                container.innerHTML = posts.length > 0 
+
+                container.innerHTML = posts.length > 0
                     ? posts.map(post => criarCardHTML(post)).join('')
                     : '<p class="text-center text-gray-600 py-10 uppercase text-xs tracking-[0.5em]">Nenhum sinal detectado na rede...</p>';
             } catch (e) {
@@ -229,7 +312,7 @@
 
         // 4. Identificação do Usuário na Sidebar
         const user = JSON.parse(localStorage.getItem('usuario'));
-        if(user) {
+        if (user) {
             document.getElementById('user-display').innerText = user.username;
         }
 
@@ -237,4 +320,5 @@
         carregarFeed();
     </script>
 </body>
+
 </html>
